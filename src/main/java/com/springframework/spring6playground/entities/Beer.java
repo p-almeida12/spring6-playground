@@ -2,6 +2,9 @@ package com.springframework.spring6playground.entities;
 
 import com.springframework.spring6playground.model.BeerStyle;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -24,10 +27,22 @@ public class Beer {
 
     @Version
     private Integer version;
+
+    @NotNull
+    @NotBlank
+    @Size(max = 50) //doent even try to persist into the database, throwing ConstraintViolationException
+    @Column(length = 50)
     private String beerName;
+    @NotNull
     private BeerStyle beerStyle;
+
+    @NotNull
+    @NotBlank
+    @Size(max = 255)
     private String upc;
     private Integer quantityOnHand;
+
+    @NotNull
     private BigDecimal price;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
