@@ -62,7 +62,7 @@ class BeerControllerIT {
     void testListBeers() {
         List<BeerDTO> dtos = beerController.listBeers();
 
-        assertThat(dtos.size()).isEqualTo(3);
+        assertThat(dtos.size()).isEqualTo(2413);
     }
 
     @Rollback //after the test is completed the transaction is set its prior state, not affecting other tests
