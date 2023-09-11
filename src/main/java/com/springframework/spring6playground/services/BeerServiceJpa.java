@@ -1,7 +1,9 @@
 package com.springframework.spring6playground.services;
 
+import com.springframework.spring6playground.entities.Beer;
 import com.springframework.spring6playground.mappers.BeerMapper;
 import com.springframework.spring6playground.model.BeerDTO;
+import com.springframework.spring6playground.model.BeerStyle;
 import com.springframework.spring6playground.repositories.BeerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -22,8 +24,36 @@ public class BeerServiceJpa implements BeerService {
     private final BeerMapper beerMapper;
 
     @Override
-    public List<BeerDTO> listBeers() {
-        return beerRepository.findAll().stream().map(beerMapper::beerToBeerDto).collect(Collectors.toList());
+    public List<BeerDTO> listBeers(String beerName, BeerStyle beerStyle, Boolean showInventory) {
+        List<Beer> beerList;
+
+        if (StringUtils.hasText(beerName) && beerStyle == null) {
+            beerList = listBeerByName(beerName);
+        } else if (!StringUtils.hasText(beerName) && beerStyle != null) {
+            beerList = listBeerByStyle(beerStyle);
+        } else if (StringUtils.hasText(beerName) && beerStyle != null) {
+            beerList = listBeersByNameAndStyle(beerName, beerStyle);
+        } else {
+            beerList = beerRepository.findAll();
+        }
+
+        if(showInventory != null && !showInventory){
+            beerList.forEach(beer -> beer.setQuantityOnHand(null));
+        }
+
+        return beerList.stream().map(beerMapper::beerToBeerDto).collect(Collectors.toList());
+    }
+
+    private List<Beer> listBeersByNameAndStyle(String beerName, BeerStyle beerStyle) {
+        return beerRepository.findAllByBeerNameIsLikeIgnoreCaseAndBeerStyle("%" + beerName + "%", beerStyle);
+    }
+
+    public List<Beer> listBeerByStyle(BeerStyle beerStyle) {
+        return beerRepository.findAllByBeerStyle(beerStyle);
+    }
+
+    List<Beer> listBeerByName(String beerName) {
+        return beerRepository.findAllByBeerNameIsLikeIgnoreCase("%" + beerName + "%");
     }
 
     @Override
