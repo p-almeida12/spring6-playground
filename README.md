@@ -15,7 +15,7 @@ features that makes the development of these applications a lot easier. [[2]](ht
 
 ## Description 
 
-Basic Spring webapp that manages beer orders running on port 8080, using the latest releases and updates of 
+Basic Spring webapp that manages beer orders running on port 8081, using the latest releases and updates of 
 Spring Framework 6. Work in progress!!!
 
 ## Features
@@ -41,4 +41,8 @@ Features explored so far:
 - Git 2.39.2
 - MySQL 8.0.33
 - Docker (optional)
+
+## Notes
+
+If you're having trouble creating the user, just run the file mysql-init.sql manually.
 

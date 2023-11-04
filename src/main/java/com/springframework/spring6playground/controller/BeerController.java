@@ -1,10 +1,14 @@
 package com.springframework.spring6playground.controller;
 
+import com.springframework.spring6playground.exception.BeerNotFoundException;
 import com.springframework.spring6playground.model.BeerDTO;
 import com.springframework.spring6playground.model.BeerStyle;
 import com.springframework.spring6playground.services.BeerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Locale;
 import java.util.UUID;
 
 @Slf4j
@@ -26,6 +31,9 @@ public class BeerController {
 
     private final BeerService beerService;
 
+    @Autowired
+    private MessageSource messageSource;
+
     @PatchMapping(BEER_PATH_ID)
     public ResponseEntity updateBeerPatchById(@PathVariable("beerId") UUID beerId, @RequestBody BeerDTO beer) {
 
@@ -38,7 +46,12 @@ public class BeerController {
     public ResponseEntity deleteById(@PathVariable("beerId") UUID beerId) {
 
         if(!beerService.deleteById(beerId)){
-            throw new NotFoundException();
+            Locale locale = LocaleContextHolder.getLocale();
+            throw new BeerNotFoundException(messageSource.getMessage(
+                    "beer.not.found.message",
+                    null,
+                    "Default Message", locale)
+                    + beerId);
         }
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -48,7 +61,12 @@ public class BeerController {
     public ResponseEntity updateById(@PathVariable("beerId") UUID beerId, @Validated @RequestBody BeerDTO beer) {
 
         if(beerService.updateBeerById(beerId, beer).isEmpty()){
-            throw new NotFoundException();
+            Locale locale = LocaleContextHolder.getLocale();
+            throw new BeerNotFoundException(messageSource.getMessage(
+                    "beer.not.found.message",
+                    null,
+                    "Default Message", locale)
+                    + beerId);
         }
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -75,7 +93,12 @@ public class BeerController {
 
     @GetMapping(BEER_PATH_ID)
     public BeerDTO getBeerById(@PathVariable("beerId") UUID beerId) {
-        return beerService.getBeerById(beerId).orElseThrow(NotFoundException::new);
+        Locale locale = LocaleContextHolder.getLocale();
+        return beerService.getBeerById(beerId).orElseThrow(() -> new BeerNotFoundException(messageSource.getMessage(
+                "beer.not.found.message",
+                null,
+                "Default Message", locale)
+                + beerId));
     }
 
 }

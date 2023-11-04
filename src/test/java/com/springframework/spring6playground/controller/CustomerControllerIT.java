@@ -1,6 +1,7 @@
 package com.springframework.spring6playground.controller;
 
 import com.springframework.spring6playground.entities.Customer;
+import com.springframework.spring6playground.exception.BeerNotFoundException;
 import com.springframework.spring6playground.mappers.CustomerMapper;
 import com.springframework.spring6playground.model.CustomerDTO;
 import com.springframework.spring6playground.repositories.CustomerRepository;
@@ -59,7 +60,7 @@ class CustomerControllerIT {
 
     @Test
     void testCustomerIdNotFound() {
-        assertThrows(NotFoundException.class, () -> {
+        assertThrows(BeerNotFoundException.class, () -> {
             customerController.getCustomerById(UUID.randomUUID());
         });
     }
@@ -77,7 +78,7 @@ class CustomerControllerIT {
 
     @Test
     void testDeleteNotFound() {
-        assertThrows(NotFoundException.class, () -> {
+        assertThrows(BeerNotFoundException.class, () -> {
             customerController.deleteById(UUID.randomUUID());
         });
     }
@@ -102,7 +103,7 @@ class CustomerControllerIT {
 
     @Test
     void testUpdateCustomerNotFound() {
-        assertThrows(NotFoundException.class, () -> {
+        assertThrows(BeerNotFoundException.class, () -> {
             customerController.updateById(UUID.randomUUID(), CustomerDTO.builder().build());
         });
     }

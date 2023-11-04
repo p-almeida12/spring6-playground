@@ -2,6 +2,7 @@ package com.springframework.spring6playground.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springframework.spring6playground.entities.Beer;
+import com.springframework.spring6playground.exception.BeerNotFoundException;
 import com.springframework.spring6playground.mappers.BeerMapper;
 import com.springframework.spring6playground.model.BeerDTO;
 import com.springframework.spring6playground.model.BeerStyle;
@@ -25,14 +26,12 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.core.Is.is;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -94,7 +93,7 @@ class BeerControllerIT {
 
     @Test
     void testBeerIdNotFound() {
-        assertThrows(NotFoundException.class, () -> {
+        assertThrows(BeerNotFoundException.class, () -> {
             beerController.getBeerById(UUID.randomUUID());
         });
     }
@@ -139,7 +138,7 @@ class BeerControllerIT {
 
     @Test
     void testUpdateBeerNotFound() {
-        assertThrows(NotFoundException.class, () -> {
+        assertThrows(BeerNotFoundException.class, () -> {
             beerController.updateById(UUID.randomUUID(), BeerDTO.builder().build());
         });
     }
@@ -157,7 +156,7 @@ class BeerControllerIT {
 
     @Test
     void testDeleteByIdNotFound() {
-        assertThrows(NotFoundException.class, () -> {
+        assertThrows(BeerNotFoundException.class, () -> {
             beerController.deleteById(UUID.randomUUID());
         });
     }

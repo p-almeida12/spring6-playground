@@ -1,16 +1,21 @@
 package com.springframework.spring6playground.controller;
 
+import com.springframework.spring6playground.exception.BeerNotFoundException;
+import com.springframework.spring6playground.exception.CustomerNotFoundException;
+import com.springframework.spring6playground.model.ErrorDetails;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class CustomErrorController {
@@ -50,6 +55,15 @@ public class CustomErrorController {
                 }).toList();
 
         return ResponseEntity.badRequest().body(errorList);
+    }
+
+    @ExceptionHandler({BeerNotFoundException.class, CustomerNotFoundException.class})
+    public final ResponseEntity<ErrorDetails> handleUserNotFoundExceptions(Exception ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(),
+                ex.getMessage(), request.getDescription(false));
+
+        return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_FOUND);
+
     }
 
 }

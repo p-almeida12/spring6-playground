@@ -1,15 +1,21 @@
 package com.springframework.spring6playground.controller;
 
+import com.springframework.spring6playground.exception.BeerNotFoundException;
+import com.springframework.spring6playground.exception.CustomerNotFoundException;
 import com.springframework.spring6playground.model.CustomerDTO;
 import com.springframework.spring6playground.services.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 @Slf4j
@@ -21,6 +27,9 @@ public class CustomerController {
     public static final String CUSTOMER_PATH_ID = CUSTOMER_PATH + "/{customerId}";
 
     private final CustomerService customerService;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @PatchMapping(CUSTOMER_PATH_ID)
     public ResponseEntity updateCustomerPatchById(@PathVariable("customerId") UUID customerId, @RequestBody CustomerDTO customer) {
@@ -34,7 +43,12 @@ public class CustomerController {
     public ResponseEntity deleteById(@PathVariable("customerId") UUID customerId) {
 
         if (!customerService.deleteById(customerId)){
-            throw new NotFoundException();
+            Locale locale = LocaleContextHolder.getLocale();
+            throw new BeerNotFoundException(messageSource.getMessage(
+                    "customer.not.found.message",
+                    null,
+                    "Default Message", locale)
+                    + customerId);
         }
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -44,7 +58,12 @@ public class CustomerController {
     public ResponseEntity updateById(@PathVariable("customerId") UUID customerId, @RequestBody CustomerDTO customer) {
 
         if (customerService.updateCustomerById(customerId, customer).isEmpty()){
-            throw new NotFoundException();
+            Locale locale = LocaleContextHolder.getLocale();
+            throw new BeerNotFoundException(messageSource.getMessage(
+                    "customer.not.found.message",
+                    null,
+                    "Default Message", locale)
+                    + customerId);
         }
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -57,7 +76,12 @@ public class CustomerController {
 
     @GetMapping(CUSTOMER_PATH_ID)
     public CustomerDTO getCustomerById(@PathVariable("customerId") UUID id) {
-        return customerService.getCustomerById(id).orElseThrow(NotFoundException::new);
+        Locale locale = LocaleContextHolder.getLocale();
+        return customerService.getCustomerById(id).orElseThrow(() -> new CustomerNotFoundException(messageSource.getMessage(
+                "customer.not.found.message",
+                null,
+                "Default Message", locale)
+                + id));
     }
 
     @PostMapping(CUSTOMER_PATH)

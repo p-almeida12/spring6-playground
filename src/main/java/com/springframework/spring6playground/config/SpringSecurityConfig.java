@@ -25,3 +25,4 @@ public class SpringSecurityConfig {
         return httpSecurity.build();
     }
 }
+
